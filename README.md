@@ -79,7 +79,7 @@ Abrir o CMD ou PowerSheel
 - conda init powershell
 - conda config --env --add channels conda-forge
 - conda config --env --set channel_priority strict
-- conda install -c conda-forge notebook dash plotly dash-html-components dash-core-components pandas scipy matplotlib scikit-learn paho-mqtt psycopg2
+- conda install -c conda-forge notebook dash plotly dash-html-components dash-core-components pandas scipy matplotlib scikit-learn paho-mqtt psycopg2 SQLAlchemy
 - pip install "dash[diskcache]" 
 - pip install dash_bootstrap_components
 
