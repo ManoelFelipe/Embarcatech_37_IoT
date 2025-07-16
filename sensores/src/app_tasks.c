@@ -23,7 +23,11 @@
 // Includes dos outros módulos do projeto
 #include "configura_geral.h"
 #include "bh1750.h"
+#include "aht10.h"
 #include "mqtt_lwip.h"
+
+// Variável global para guardar os dados do AHT10
+static aht10_data_t aht10_dados;
 
 /**
  * @brief Implementação da configuração da comunicação serial.
@@ -71,21 +75,40 @@ void configurar_perifericos() {
     printf("Inicializando periféricos...\n");
     
     // --- Configuração do I2C ---
+
+     // --- CONFIGURAÇÃO DO I2C0 PARA O AHT10 ---
+    i2c_init(I2C0_PORT, 100 * 1000);
+    gpio_set_function(I2C0_SDA_PIN, GPIO_FUNC_I2C);
+    gpio_set_function(I2C0_SCL_PIN, GPIO_FUNC_I2C);
+    gpio_pull_up(I2C0_SDA_PIN);
+    gpio_pull_up(I2C0_SCL_PIN);
+    printf("Barramento I2C0 inicializado nos pinos %d (SDA) e %d (SCL).\n", I2C0_SDA_PIN, I2C0_SCL_PIN);
+
+    // Inicialização do Sensor AHT10
+    if (aht10_init(I2C0_PORT)) {
+        printf("Sensor de umidade/temperatura AHT10 pronto para uso.\n");
+    } else {
+        printf("ERRO: Falha ao inicializar o sensor AHT10.\n");
+    }
+
+
     // Inicializa o barramento I2C 'i2c1' com uma velocidade de 100 kHz.
-    i2c_init(i2c1, 100 * 1000);
+    i2c_init(I2C1_PORT, 100 * 1000); // Usando a constante de configura_geral.h
     // Associa os pinos GPIO 2 e 3 às funções de SDA (Dados) e SCL (Clock) do I2C.
-    gpio_set_function(2, GPIO_FUNC_I2C); // SDA
-    gpio_set_function(3, GPIO_FUNC_I2C); // SCL
+    gpio_set_function(I2C1_SDA_PIN, GPIO_FUNC_I2C);
+    gpio_set_function(I2C1_SCL_PIN, GPIO_FUNC_I2C);
     // Habilita os resistores de pull-up internos nos pinos do I2C.
     // Isso é necessário para manter as linhas em estado alto quando não estão sendo usadas.
-    gpio_pull_up(2);
-    gpio_pull_up(3);
+    gpio_pull_up(I2C1_SDA_PIN);
+    gpio_pull_up(I2C1_SCL_PIN);
     printf("Barramento I2C inicializado nos pinos 2 (SDA) e 3 (SCL).\n");
 
     // --- Inicialização do Sensor ---
     // Chama a função de inicialização da biblioteca do sensor BH1750.
-    bh1750_iniciar();
+    bh1750_iniciar(I2C1_PORT);
     printf("Sensor de luminosidade BH1750 pronto para uso.\n");
+
+    
 }
 
 /**
@@ -110,27 +133,42 @@ void conectar_mqtt_inicial() {
 }
 
 /**
- * @brief Implementação do ciclo de leitura e publicação.
+ * @brief 3. IMPLEMENTAÇÃO DO CICLO COM LEITURA COMBINADA E PUBLICAÇÃO JSON.
  */
 void processar_ciclo_operacional() {
-    // Buffers locais para armazenar o tópico e o payload da mensagem MQTT.
-    char topico_completo[128];
-    char payload_lux[20];
+    // Buffers para o tópico e o payload JSON.
+    char topico_json[128];
+    char payload_json[256]; // Aumentar buffer para conter todos os dados
 
-    // Realiza a leitura da luminosidade a partir do sensor BH1750.
-    float lux = bh1750_ler_lux();
-    printf("Luminosidade: %.2f Lux\n", lux);
-
-    // Monta a string do tópico completo de forma segura para evitar estouro de buffer.
-    // Ex: "Sensores/dados/Sensor_Luz"
-    snprintf(topico_completo, sizeof(topico_completo), "%s/%s", DEVICE_ID, TOPICO_PUBLICACAO_LUZ);
+    // --- Leitura dos Sensores ---
     
-    // Converte o valor de ponto flutuante (float) para uma string.
-    // Ex: 150.75
-    snprintf(payload_lux, sizeof(payload_lux), "%.2f", lux);
+    // Leitura do AHT10 (Temperatura e Umidade)
+    if (aht10_read_data(I2C0_PORT, &aht10_dados)) {
+        printf("AHT10 -> Temperatura: %.2f C, Umidade: %.2f %%\n", aht10_dados.temperature, aht10_dados.humidity);
+    } else {
+        printf("Falha na leitura do AHT10. Usando valores padrão.\n");
+        // Atribuir valores padrão em caso de falha para não quebrar o JSON
+        aht10_dados.temperature = 0.0;
+        aht10_dados.humidity = 0.0;
+    }
+    
+    // Leitura do BH1750 (Luminosidade)
+    float lux = bh1750_ler_lux(I2C1_PORT);
+    printf("BH1750 -> Luminosidade: %.2f Lux\n", lux);
 
-    // Chama a função da biblioteca MQTT para publicar a mensagem no broker.
-    publicar_mensagem_mqtt(topico_completo, payload_lux);
+    // --- Montagem do Payload JSON ---
+    // Formata os dados dos sensores em uma única string JSON.
+    snprintf(payload_json, sizeof(payload_json),
+             "{\"temperatura\":%.2f, \"umidade\":%.2f, \"luminosidade\":%.2f}",
+             aht10_dados.temperature, aht10_dados.humidity, lux);
+
+    // --- Publicação via MQTT ---
+    
+    // Monta o nome completo do tópico para a publicação JSON.
+    snprintf(topico_json, sizeof(topico_json), "%s/%s", DEVICE_ID, TOPICO_PUBLICACAO_JSON);
+
+    printf("Publicando em '%s': %s\n", topico_json, payload_json);
+    publicar_mensagem_mqtt(topico_json, payload_json);
 }
 
 /**

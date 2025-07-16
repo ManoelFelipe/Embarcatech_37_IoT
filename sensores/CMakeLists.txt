@@ -39,7 +39,8 @@ add_executable(sensores
     src/main.c
     src/app_tasks.c
     libs/mqtt/mqtt_lwip.c
-    libs/bh1750/bh1750.c 
+    libs/bh1750/bh1750.c
+    libs/aht10/aht10.c
 )
 
 pico_set_program_name(sensores "sensores")
@@ -62,8 +63,9 @@ target_include_directories(sensores PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
         ${CMAKE_CURRENT_LIST_DIR}/libs
         ${CMAKE_CURRENT_LIST_DIR}/libs/mqtt
-        ${CMAKE_CURRENT_LIST_DIR}/libs/bh1750
         ${CMAKE_CURRENT_LIST_DIR}/libs/WiFi
+        ${CMAKE_CURRENT_LIST_DIR}/libs/bh1750
+        ${CMAKE_CURRENT_LIST_DIR}/libs/aht10
 )
 
 pico_add_extra_outputs(sensores)

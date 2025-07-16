@@ -13,28 +13,20 @@
 #ifndef BH1750_H
 #define BH1750_H
 
-/**
- * @brief Inicializa o sensor BH1750, enviando o comando para ligá-lo (power on).
- *
- * Esta função envia um comando essencial para "acordar" o sensor e prepará-lo
- * para receber comandos de medição.
- *
- * @note A inicialização do barramento I2C (`i2c_init()`) deve ser feita
- * externamente (por exemplo, no `app_tasks.c` ou `main.c`) antes de chamar esta função.
- * Isso permite que o mesmo barramento I2C seja compartilhado com outros sensores.
- */
-void bh1750_iniciar(void);
+#include "pico/stdlib.h"
+#include "hardware/i2c.h"
 
 /**
- * @brief Solicita uma nova medição ao sensor, aguarda a conversão e retorna o valor em Lux.
- *
- * O processo completo envolve enviar um comando de medição, aguardar o tempo
- * de conversão especificado pelo datasheet do sensor, ler os bytes de dados brutos
- * e, por fim, convertê-los para a unidade de medida Lux.
- *
- * @return float O valor da luminosidade em Lux.
- * @retval -1.0f em caso de erro de comunicação com o sensor via I2C.
+ * @brief Inicializa o sensor BH1750 no barramento I2C especificado.
+ * @param i2c_port Ponteiro para a instância I2C (ex: i2c0, i2c1).
  */
-float bh1750_ler_lux(void);
+void bh1750_iniciar(i2c_inst_t *i2c_port);
+
+/**
+ * @brief Lê o valor de luminosidade (em Lux) do sensor.
+ * @param i2c_port Ponteiro para a instância I2C onde o sensor está conectado.
+ * @return O valor de luminosidade em Lux como um float.
+ */
+float bh1750_ler_lux(i2c_inst_t *i2c_port);
 
 #endif // BH1750_H

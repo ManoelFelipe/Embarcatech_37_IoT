@@ -25,9 +25,7 @@
  * @brief Define qual dos dois barramentos I2C do Pico será usado.
  * O RP2040 possui i2c0 e i2c1.
  */
-#define I2C_PORT i2c1
-#define I2C_SDA_PIN 2
-#define I2C_SCL_PIN 3
+//#define I2C_PORT i2c1
 
 /**
  * @brief Endereço padrão do sensor BH1750 na comunicação I2C.
@@ -41,54 +39,43 @@
 // São declarados como 'const' para que possamos obter seu endereço com '&',
 // o que é necessário para as funções de escrita I2C do SDK.
 
-/** @brief Comando para ligar o oscilador interno do sensor. */
-const uint8_t BH1750_CMD_POWER_ON = 0x01;
-
-/** @brief Comando para iniciar uma medição no modo de alta resolução (precisão de 1 lux). */
-const uint8_t BH1750_CMD_HIRES1 = 0x20;
-
+// Comandos de Operação do Sensor BH1750
+static const uint8_t CMD_POWER_ON = 0x01;
+static const uint8_t CMD_CONTINUOUS_HIGH_RES = 0x10; // Modo contínuo, alta resolução 1
 
 /**
  * @brief Envia os comandos iniciais para ligar e configurar o sensor BH1750.
  */
-void bh1750_iniciar(void) {
-    // Envia o comando para "acordar" o sensor. O último parâmetro 'false'
-    // indica para a função I2C liberar o barramento após a escrita (enviar um STOP).
-    i2c_write_blocking(I2C_PORT, BH1750_ADDR, &BH1750_CMD_POWER_ON, 1, false);
-    // Uma pequena pausa para garantir que o sensor esteja pronto para o próximo comando.
+
+void bh1750_iniciar(i2c_inst_t *i2c) {
+    // 1. Envia comando para ligar o sensor
+    i2c_write_blocking(i2c, BH1750_ADDR, &CMD_POWER_ON, 1, false);
+    sleep_ms(10); // Pequena espera
+
+    // 2. Configura para o modo de medição contínua de alta resolução.
+    // Neste modo, o sensor fará medições constantemente, não precisamos
+    // enviar um comando a cada leitura.
+    i2c_write_blocking(i2c, BH1750_ADDR, &CMD_CONTINUOUS_HIGH_RES, 1, false);
     sleep_ms(10);
 }
 
 /**
  * @brief Realiza uma leitura completa do sensor e converte o valor para Lux.
  */
-float bh1750_ler_lux(void) {
-    // Array para armazenar os 2 bytes de dados brutos recebidos do sensor.
+float bh1750_ler_lux(i2c_inst_t *i2c) {
     uint8_t raw_data[2];
 
-    // 1. Envia o comando para o sensor iniciar uma nova medição.
-    i2c_write_blocking(I2C_PORT, BH1750_ADDR, &BH1750_CMD_HIRES1, 1, false);
-    
-    // 2. Aguarda o tempo necessário para a conversão interna do sensor.
-    // Este valor (180ms) vem do datasheet e é o tempo máximo para o modo de alta resolução.
-    sleep_ms(180); 
-    
-    // 3. Lê os 2 bytes do resultado da medição.
-    // A função retorna o número de bytes lidos com sucesso.
-    int bytes_read = i2c_read_blocking(I2C_PORT, BH1750_ADDR, raw_data, 2, false);
-    
-    // Verifica se a leitura foi bem-sucedida. Se menos de 2 bytes foram lidos, houve um erro.
+    // Como o sensor está em modo contínuo, só precisamos ler o valor mais recente.
+    int bytes_read = i2c_read_blocking(i2c, BH1750_ADDR, raw_data, 2, false);
+
+    // Verifica se a leitura foi bem-sucedida.
     if (bytes_read < 2) {
-        return -1.0f; // Retorna um valor de erro definido.
+        return -1.0f; // Retorna um valor de erro.
     }
-    
-    // 4. Combina os dois bytes de 8 bits em um único valor inteiro de 16 bits.
-    // Isso é feito usando operações de deslocamento de bits (bit-shifting).
-    // `raw_data[0]` é o byte mais significativo (MSB) e `raw_data[1]` o menos significativo (LSB).
+
+    // Combina os dois bytes em um valor de 16 bits.
     uint16_t raw_value = (raw_data[0] << 8) | raw_data[1];
-    
-    // 5. Converte o valor bruto para Lux.
-    // O fator de conversão 1.2 também é especificado no datasheet do BH1750.
-    // A conversão para (float) garante que a divisão seja de ponto flutuante.
+
+    // Converte o valor bruto para Lux usando o fator do datasheet.
     return (float)raw_value / 1.2f;
 }

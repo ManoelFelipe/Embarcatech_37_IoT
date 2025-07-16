@@ -12,6 +12,7 @@
 ![Ciência de Dados](https://img.shields.io/badge/Ciência%20de%20Dados-Ativa-blueviolet?logo=scikit-learn)
 ![Análise de Dados](https://img.shields.io/badge/Análise%20de%20Dados-Em%20Curso-lightgrey?logo=pandas&logoColor=black)
 ![Pipeline](https://img.shields.io/badge/Pipeline-Dados-green?logo=airflow&logoColor=white)
+![Sensor](https://img.shields.io/badge/Sensor-AHT10-9cf.svg)
 
 
 
@@ -53,6 +54,34 @@ O fluxo de dados segue a seguinte arquitetura:
 ## 📈 Configuração Banco de Dados Postgres
 
 ## 📈 Configuração Ambiente de Criação de Dashboards, Análise de Dados e Ciência dados.
+
+Pode ser instalado em outros sistemas operacionais, como MAC, Windowns e Linux.
+- Baixar para o software no site:
+https://conda-forge.org/
+- Baixar para o software no site:
+https://code.visualstudio.com/
+
+Instrução para Windows:
+
+1) Instalando o Conda-Forge
+Link: https://github.com/conda-forge/miniforge/releases/latest/download/
+- Instalar para o usuário usuário local preferencialmente e 
+selecionar para adicionar no PATH as variáveis.
+- Extra: Remendo usar o Windows Terminar para acessar o PowerSheel e o cmd
+
+2) Instalando o VSCODE
+Link: https://code.visualstudio.com/
+
+Abrir o CMD ou PowerSheel
+
+- conda update -n base -c conda-forge conda
+- conda create -n env_01 -c conda-forge
+- conda init powershell
+- conda config --env --add channels conda-forge
+- conda config --env --set channel_priority strict
+- conda install -c conda-forge notebook dash plotly dash-html-components dash-core-components pandas scipy matplotlib scikit-learn paho-mqtt psycopg2
+- pip install "dash[diskcache]" 
+- pip install dash_bootstrap_components
 
 ## 📂 Estrutura dos Arquivos
 
