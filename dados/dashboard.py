@@ -10,8 +10,8 @@ import plotly.graph_objs as go
 import pandas as pd
 from sqlalchemy import create_engine
 from sklearn.ensemble import IsolationForest
-from sklearn.linear_model import LinearRegression # <-- MUDANÇA: Modelo para previsão
-import numpy as np # <-- MUDANÇA: Para cálculos numéricos na previsão
+from sklearn.linear_model import LinearRegression # Modelo para previsão
+import numpy as np # Para cálculos numéricos na previsão
 
 # =================================================================================
 # --- CONFIGURAÇÕES ---
@@ -59,7 +59,7 @@ def detectar_anomalias(df):
     df['anomalia'] = model.predict(df[features])
     return df
 
-# <-- MUDANÇA: Nova função para o modelo de previsão
+# Nova função para o modelo de previsão
 def prever_proxima_temperatura(df):
     """Usa Regressão Linear para prever o próximo valor de temperatura."""
     if df.shape[0] < 10: # Precisa de um mínimo de dados para uma previsão razoável
