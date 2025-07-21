@@ -1,7 +1,3 @@
-# Embarcatech_37_IoT
-
-# 💡 Projeto de Aquisição e Análise de Dados de Sensores IoT com Pico W (BITDOGLAB), WiFi com MQTT.
-
 ![Linguagem](https://img.shields.io/badge/Linguagem-C-blue.svg)
 ![Linguagem](https://img.shields.io/badge/Linguagem-Python-yellow.svg)
 ![Plataforma](https://img.shields.io/badge/Plataforma-Raspberry%20Pi%20Pico%20W-purple.svg)
@@ -12,7 +8,15 @@
 ![Ciência de Dados](https://img.shields.io/badge/Ciência%20de%20Dados-Ativa-blueviolet?logo=scikit-learn)
 ![Análise de Dados](https://img.shields.io/badge/Análise%20de%20Dados-Em%20Curso-lightgrey?logo=pandas&logoColor=black)
 ![Pipeline](https://img.shields.io/badge/Pipeline-Dados-green?logo=airflow&logoColor=white)
-![Sensor](https://img.shields.io/badge/Sensor-AHT10-9cf.svg)
+![Sensor](https://img.shields.io/badge/Sensor-AHT10-9cf.svg) 
+
+## Esse projeto tem como objetivo produzir um trabalho final para a primeira fase do projeto Embarcatech_37_IoT, Residência Profissional em Software Embarcado.
+- Nessa primeira fase, foi utilizado alguns equipamentos como:
+- A placa bitdoglag, um computador, sensores e atuadores.
+
+
+- 💡 Nome deste projeto: Projeto de Aquisição e Análise de Dados de Sensores IoT com Pico W (BITDOGLAB), WiFi com MQTT, Sensores e Atuadores.
+
 
 
 
@@ -25,7 +29,7 @@
 * **Sistema Robusto:** Inclui lógica de reconexão automática ao broker MQTT em caso de falha na conexão.
 * **Configuração Centralizada:** Todas as configurações (credenciais, IPs, tópicos) estão em um único arquivo `configura_geral.h`.
 * **Firmware Otimizado:** Configurações da pilha de rede lwIP ajustadas para garantir estabilidade e evitar erros de alocação de memória.
-* **Firmware Otimizado:** 
+
 
 ## 📊 Painel de Controle (Resultado Final)
 
@@ -49,16 +53,27 @@ O fluxo de dados segue a seguinte arquitetura:
 
 ## 🚀 Como Compilar e Usar
 
-## 📈 Configuração do Node-RED
+## 📈 Configuração do Node-RED e NodeJs
+
+- Baixar para o software no site: \
+https://nodered.org/docs/getting-started/local \
+Versão Usada:  Node-RED version: v4.0.9
+
+- Baixar para o software no site: \
+https://nodejs.org/pt/download \
+Versão Usada: Node.js  version: v22.17.0
 
 ## 📈 Configuração Banco de Dados Postgres
+- Baixar para o software no site: \
+https://www.postgresql.org/download/ \
+Versão Usada: PostgreSQL 17
 
 ## 📈 Configuração Ambiente de Criação de Dashboards, Análise de Dados e Ciência dados.
 
 Pode ser instalado em outros sistemas operacionais, como MAC, Windowns e Linux.
-- Baixar para o software no site:
+- Baixar para o software no site: \
 https://conda-forge.org/
-- Baixar para o software no site:
+- Baixar para o software no site: \
 https://code.visualstudio.com/
 
 Instrução para Windows:
@@ -85,5 +100,9 @@ Abrir o CMD ou PowerSheel
 
 ## 📂 Estrutura dos Arquivos
 
+
+
 ## 🔮 Possíveis Melhorias Futuras
+
+
 
